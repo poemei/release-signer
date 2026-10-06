@@ -6,6 +6,7 @@ cd /d "%~dp0"
 set "CC=cl"
 set "OUTDIR=build"
 set "TARGET=%OUTDIR%\release-signer.exe"
+set "OPENSSL_LIB_DIR=%OPENSSL_ROOT_DIR%\lib\VC\x64\MD"
 
 if not exist "%OUTDIR%" mkdir "%OUTDIR%"
 
@@ -21,7 +22,7 @@ if not defined OPENSSL_ROOT_DIR (
     echo [INFO] Set OPENSSL_ROOT_DIR to the OpenSSL installation directory.
     echo [INFO] Expected:
     echo        %%OPENSSL_ROOT_DIR%%\include
-    echo        %%OPENSSL_ROOT_DIR%%\lib
+    echo        %%OPENSSL_ROOT_DIR%%\lib\VC\x64\MD
     exit /b 1
 )
 
@@ -31,9 +32,9 @@ if not exist "%OPENSSL_ROOT_DIR%\include\openssl\evp.h" (
     exit /b 1
 )
 
-if not exist "%OPENSSL_ROOT_DIR%\lib" (
-    echo [FAIL] OpenSSL library directory was not found:
-    echo        %OPENSSL_ROOT_DIR%\lib
+if not exist "%OPENSSL_LIB_DIR%\libcrypto.lib" (
+    echo [FAIL] OpenSSL release library was not found:
+    echo        %OPENSSL_LIB_DIR%\libcrypto.lib
     exit /b 1
 )
 
@@ -48,7 +49,7 @@ echo [INFO] Building ChAoS Release Signer...
     src\release.c ^
     /Fe:"%TARGET%" ^
     /link ^
-    /LIBPATH:"%OPENSSL_ROOT_DIR%\lib" ^
+    /LIBPATH:"%OPENSSL_LIB_DIR%" ^
     libcrypto.lib
 
 if errorlevel 1 (
